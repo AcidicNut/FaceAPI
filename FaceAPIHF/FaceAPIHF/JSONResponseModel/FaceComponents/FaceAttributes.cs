@@ -1,8 +1,9 @@
-﻿using System;
+﻿using FaceAPIHF.JSONResponseModel.FaceComponents;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FaceAPIHF.ResponseModel.FaceComponents
+namespace FaceAPIHF.FaceComponents
 {
     class FaceAttributes
     {
@@ -11,5 +12,6 @@ namespace FaceAPIHF.ResponseModel.FaceComponents
         public double Age { get; set; }
         public FaceRectangle FaceRectangle { get; set; }
         public FacialHair FacialHair { get; set; }
+        public string glasses { get; set; }
     }
 }

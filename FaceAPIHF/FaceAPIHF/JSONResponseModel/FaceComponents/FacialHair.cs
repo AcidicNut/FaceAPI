@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FaceAPIHF.ResponseModel.FaceComponents
+namespace FaceAPIHF.JSONResponseModel.FaceComponents
 {
     class FacialHair
     {

@@ -6,16 +6,15 @@
 
     <StackLayout x:Name="PageStackLayout" Orientation="Vertical">
         <Grid HorizontalOptions="Center" VerticalOptions="FillAndExpand" x:Name="PhotoAndControls">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Image x:Name="FaceImage" Grid.Row="0" Source="http://1.bp.blogspot.com/-hNC-oT6f-fY/TeXxO26yjvI/AAAAAAAAAOY/qfkOqdKkBi8/s1600/platon-photographer-putin-man-of-the-year-portrait.jpg" />
+            <Image x:Name="FaceImage" Grid.Row="0" />
             <Grid VerticalOptions="Start"  Grid.Row="1">
-                <Button Grid.Column="0" Text="FilePicker" />
+                <Button Grid.Column="0" Text="FilePicker" Clicked="PickerButton_ClickedAsync" />
                 <Button Grid.Column="1" Text="Photo" />
-                <Button Grid.Column="2" Text="Analize" />
+                <Button Grid.Column="2" Text="Analize" Clicked="AnalizeButton_ClickedAsync"/>
             </Grid>
         </Grid>
-        <Label Text="DATA"/>
+        <Label x:Name="GenderLabel" Text="DATA"/>
+        <Label x:Name="AgeLabel" Text="DATA"/>
+        <Label x:Name="GlassesLabel" Text="DATA"/>
     </StackLayout>
 </ContentPage>
