@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Plugin.Media;
+using Plugin.Media.Abstractions;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System;
@@ -77,9 +78,9 @@ namespace FaceAPIHF
             await CrossMedia.Current.Initialize();
             try
             {
-                var file = await CrossMedia.Current.PickPhotoAsync(new Plugin.Media.Abstractions.PickMediaOptions
+                var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
                 {
-                    PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
+                    PhotoSize = PhotoSize.Medium
                 });
                 using (var memoryStream = new MemoryStream())
                 {
@@ -101,7 +102,12 @@ namespace FaceAPIHF
 
         private async void CameraButtonClickedAsync(object sender, EventArgs e)
         {
-            var photo = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions() { });
+            var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
+            {
+                PhotoSize = PhotoSize.Medium,
+                DefaultCamera = CameraDevice.Front,
+                SaveToAlbum = true
+            });
 
             if (photo != null)
             {
