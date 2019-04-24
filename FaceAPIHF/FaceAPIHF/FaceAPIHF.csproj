@@ -11,10 +11,11 @@
 
   <ItemGroup>
     <None Remove="kep.jpg" />
+    <None Remove="kep.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="kep.jpg" />
+    <EmbeddedResource Include="kep.png" />
   </ItemGroup>
 
   <ItemGroup>

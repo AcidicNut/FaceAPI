@@ -15,6 +15,7 @@ namespace FaceAPIHF
 {
     public partial class MainPage : ContentPage
     {
+        private byte[] faceImageByteArray;
         private const string subscriptionKey = "8f68ecde3f0742b79204b409bdcc59cf";
 
         private const string faceEndpoint =
@@ -23,13 +24,15 @@ namespace FaceAPIHF
         public MainPage()
         {
             InitializeComponent();
-            FaceImage.Source = ImageSource.FromResource("FaceAPIHF.kep.jpg");
+            FaceImage.Source = ImageSource.FromResource("FaceAPIHF.kep.png");
+            
             SizeChanged += MainPageSizeChanged;
         }
 
         private void MainPageSizeChanged(object sender, EventArgs e)
         {
-            PageStackLayout.Orientation = Width > Height ? StackOrientation.Horizontal : StackOrientation.Vertical;
+                PageStackLayout.Orientation = Width > Height ? StackOrientation.Horizontal : StackOrientation.Vertical;
+
         }
 
         private async void AnalizeButton_ClickedAsync(object sender, EventArgs e)
@@ -42,31 +45,26 @@ namespace FaceAPIHF
             string uri = faceEndpoint + "?" + requestParameters;
 
             HttpResponseMessage response;
-
-            //byte[] byteData = GetImageAsByteArray("D:\\VIK\\kliens\\HF\\FaceAPIHF\\FaceAPIHF\\FaceAPIHF\\kep.jpg");
-
-            //using (ByteArrayContent content = new ByteArrayContent(byteData))
-            //{
-            //    content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            //    response = await client.PostAsync(uri, content);
-
-            //    string contentString = await response.Content.ReadAsStringAsync();
-
-            //    var faceDetails = JsonConvert.DeserializeObject<List<ResponseModel>>(contentString);
-            //    if (faceDetails.Count != 0)
-            //    {
-            //        GenderLabel.Text = "Gender : " + faceDetails[0].FaceAttributes.Gender;
-            //        AgeLabel.Text = "Age : " + faceDetails[0].FaceAttributes.Age;
-            //    }
-            //}
-        }
-        public byte[] GetImageAsByteArray(string imageFilePath)
-        {
-            using (FileStream fileStream =
-                new FileStream(imageFilePath, FileMode.Open, FileAccess.Read))
+            if (faceImageByteArray != null)
             {
-                BinaryReader binaryReader = new BinaryReader(fileStream);
-                return binaryReader.ReadBytes((int)fileStream.Length);
+                using (ByteArrayContent content = new ByteArrayContent(faceImageByteArray))
+                {
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    response = await client.PostAsync(uri, content);
+
+                    string contentString = await response.Content.ReadAsStringAsync();
+
+                    var faceDetails = JsonConvert.DeserializeObject<List<ResponseModel>>(contentString);
+                    if (faceDetails.Count != 0)
+                    {
+                        GenderLabel.Text = "Gender : " + faceDetails[0].FaceAttributes.Gender;
+                        AgeLabel.Text = "Age : " + faceDetails[0].FaceAttributes.Age;
+                        GlassesLabel.Text = "Glasses : " + faceDetails[0].FaceAttributes.Glasses;
+                        BaldLabel.Text = "Bald : " + faceDetails[0].FaceAttributes.Hair.Bald;
+                        InvisibleLabel.Text = "Invisible : " + faceDetails[0].FaceAttributes.Hair.Invisible;
+                        HairColorsLabel.Text = "HairColors : \n" + faceDetails[0].FaceAttributes.Hair.JSONHairColors();
+                    }
+                }
             }
         }
 
@@ -79,8 +77,14 @@ namespace FaceAPIHF
                 {
                     PhotoSize = Plugin.Media.Abstractions.PhotoSize.Medium
                 });
+                using (var memoryStream = new MemoryStream())
+                {
+                    file.GetStream().CopyTo(memoryStream);
+                    faceImageByteArray = memoryStream.ToArray();
+                }
                 if (file == null) return;
-                FaceImage.Source = ImageSource.FromStream(() => {
+                FaceImage.Source = ImageSource.FromStream(() =>
+                {
                     var stream = file.GetStream();
                     return stream;
                 });

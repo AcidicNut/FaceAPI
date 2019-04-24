@@ -5,16 +5,21 @@
              x:Class="FaceAPIHF.MainPage">
 
     <StackLayout x:Name="PageStackLayout" Orientation="Vertical">
-        <Grid HorizontalOptions="Center" VerticalOptions="FillAndExpand" x:Name="PhotoAndControls">
-            <Image x:Name="FaceImage" Grid.Row="0" />
-            <Grid VerticalOptions="Start"  Grid.Row="1">
+        <Grid>
+            <Image x:Name="FaceImage" Grid.Column="0" Grid.Row="0" />
+            <Grid VerticalOptions="Start" Grid.Column="0" Grid.Row="1">
                 <Button Grid.Column="0" Text="FilePicker" Clicked="PickerButton_ClickedAsync" />
                 <Button Grid.Column="1" Text="Photo" />
                 <Button Grid.Column="2" Text="Analize" Clicked="AnalizeButton_ClickedAsync"/>
             </Grid>
         </Grid>
-        <Label x:Name="GenderLabel" Text="DATA"/>
-        <Label x:Name="AgeLabel" Text="DATA"/>
-        <Label x:Name="GlassesLabel" Text="DATA"/>
+        <StackLayout x:Name="DataStackLayout">
+            <Label x:Name="GenderLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="AgeLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="GlassesLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="BaldLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="InvisibleLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="HairColorsLabel" Text="DATA1DATA2DATA3"/>
+        </StackLayout>
     </StackLayout>
 </ContentPage>
