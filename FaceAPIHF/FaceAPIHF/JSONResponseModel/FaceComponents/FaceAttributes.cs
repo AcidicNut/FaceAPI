@@ -13,5 +13,6 @@ namespace FaceAPIHF.FaceComponents
         public FaceRectangle FaceRectangle { get; set; }
         public FacialHair FacialHair { get; set; }
         public string Glasses { get; set; }
+        public double Smile { get; set; }
     }
 }

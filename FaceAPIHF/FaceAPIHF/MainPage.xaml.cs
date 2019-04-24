@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Plugin.Media;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,13 +27,13 @@ namespace FaceAPIHF
         {
             InitializeComponent();
             FaceImage.Source = ImageSource.FromResource("FaceAPIHF.kep.png");
-            
+
             SizeChanged += MainPageSizeChanged;
         }
 
         private void MainPageSizeChanged(object sender, EventArgs e)
         {
-                PageStackLayout.Orientation = Width > Height ? StackOrientation.Horizontal : StackOrientation.Vertical;
+            PageStackLayout.Orientation = Width > Height ? StackOrientation.Horizontal : StackOrientation.Vertical;
 
         }
 
@@ -40,7 +42,7 @@ namespace FaceAPIHF
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
             string requestParameters = "returnFaceId=true&returnFaceLandmarks=false" +
-                "&returnFaceAttributes=age,gender,facialHair,glasses,hair";
+                "&returnFaceAttributes=age,gender,facialHair,glasses,hair,smile";
 
             string uri = faceEndpoint + "?" + requestParameters;
 
@@ -62,7 +64,9 @@ namespace FaceAPIHF
                         GlassesLabel.Text = "Glasses : " + faceDetails[0].FaceAttributes.Glasses;
                         BaldLabel.Text = "Bald : " + faceDetails[0].FaceAttributes.Hair.Bald;
                         InvisibleLabel.Text = "Invisible : " + faceDetails[0].FaceAttributes.Hair.Invisible;
-                        HairColorsLabel.Text = "HairColors : \n" + faceDetails[0].FaceAttributes.Hair.JSONHairColors();
+                        MoustacheLabel.Text = "Moustache : " + faceDetails[0].FaceAttributes.FacialHair.Moustache;
+                        BeardLabel.Text = "Beard : " + faceDetails[0].FaceAttributes.FacialHair.Beard;
+                        SideburnsLabel.Text = "Sideburns : " + faceDetails[0].FaceAttributes.FacialHair.Sideburns;
                     }
                 }
             }
@@ -92,6 +96,21 @@ namespace FaceAPIHF
             catch (Exception ex)
             {
                 string test = ex.Message;
+            }
+        }
+
+        private async void CameraButtonClickedAsync(object sender, EventArgs e)
+        {
+            var photo = await CrossMedia.Current.TakePhotoAsync(new Plugin.Media.Abstractions.StoreCameraMediaOptions() { });
+
+            if (photo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    photo.GetStream().CopyTo(memoryStream);
+                    faceImageByteArray = memoryStream.ToArray();
+                }
+                FaceImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
             }
         }
     }

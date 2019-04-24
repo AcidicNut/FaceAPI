@@ -9,7 +9,7 @@
             <Image x:Name="FaceImage" Grid.Column="0" Grid.Row="0" />
             <Grid VerticalOptions="Start" Grid.Column="0" Grid.Row="1">
                 <Button Grid.Column="0" Text="FilePicker" Clicked="PickerButton_ClickedAsync" />
-                <Button Grid.Column="1" Text="Photo" />
+                <Button Grid.Column="1" Text="Photo" Clicked="CameraButtonClickedAsync"/>
                 <Button Grid.Column="2" Text="Analize" Clicked="AnalizeButton_ClickedAsync"/>
             </Grid>
         </Grid>
@@ -19,7 +19,9 @@
             <Label x:Name="GlassesLabel" Text="DATA1DATA2DATA3"/>
             <Label x:Name="BaldLabel" Text="DATA1DATA2DATA3"/>
             <Label x:Name="InvisibleLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="HairColorsLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="MoustacheLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="BeardLabel" Text="DATA1DATA2DATA3"/>
+            <Label x:Name="SideburnsLabel" Text="DATA1DATA2DATA3"/>
         </StackLayout>
     </StackLayout>
 </ContentPage>
