@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FaceAPIHF.JSONResponseModel.FaceComponents
+﻿namespace FaceAPIHF.Face
 {
-    class FaceRectangle
+    public class FaceRectangle
     {
         public int Top { get; set; }
         public int Left { get; set; }
