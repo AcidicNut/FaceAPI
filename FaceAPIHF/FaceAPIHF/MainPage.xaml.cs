@@ -67,32 +67,35 @@ namespace FaceAPIHF
 
         private async void AnalizeButton_ClickedAsync(object sender, EventArgs e)
         {
-            var detectedFaces = await DetectAsync();
-            DataStackLayout.Children.Clear();
-            foreach ( var face in detectedFaces)
+            if (faceImageByteArray != null)
             {
-                // Create canvas based on bitmap
-                using (SKCanvas canvas = new SKCanvas(faceBitmap))
+                var detectedFaces = await DetectAsync();
+                DataStackLayout.Children.Clear();
+                foreach (var face in detectedFaces)
                 {
-                    using (SKPaint paint = new SKPaint())
+                    // Create canvas based on bitmap
+                    using (SKCanvas canvas = new SKCanvas(faceBitmap))
                     {
-                        paint.Style = SKPaintStyle.Stroke;
-                        paint.Color = SKColors.Red;
-                        paint.StrokeWidth = 10;
-                        paint.StrokeCap = SKStrokeCap.Round;
+                        using (SKPaint paint = new SKPaint())
+                        {
+                            paint.Style = SKPaintStyle.Stroke;
+                            paint.Color = SKColors.Red;
+                            paint.StrokeWidth = 10;
+                            paint.StrokeCap = SKStrokeCap.Round;
 
-                        canvas.DrawRect(new SKRect(face.FaceRectangle.Left,
-                                                    face.FaceRectangle.Top,
-                           face.FaceRectangle.Left + face.FaceRectangle.Width,
-                           face.FaceRectangle.Top + face.FaceRectangle.Height), paint);
+                            canvas.DrawRect(new SKRect(face.FaceRectangle.Left,
+                                                        face.FaceRectangle.Top,
+                               face.FaceRectangle.Left + face.FaceRectangle.Width,
+                               face.FaceRectangle.Top + face.FaceRectangle.Height), paint);
+                        }
                     }
+                    MyCanvas.InvalidateSurface();
+                    var detailsAdder = new Details();
+                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
+                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
+                    detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
+                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
                 }
-                MyCanvas.InvalidateSurface();
-                var detailsAdder = new Details();
-                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
-                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
-                detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
-                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
             }
         }
 
@@ -102,7 +105,7 @@ namespace FaceAPIHF
             try
             {
                 var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
-                {});
+                { });
                 if (file == null) return;
                 Stream stream = file.GetStream();
                 using (var memoryStream = new MemoryStream())
