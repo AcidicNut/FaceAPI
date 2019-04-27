@@ -12,7 +12,6 @@ namespace FaceAPIHF.Face
         [JsonProperty("hairColor", NullValueHandling = NullValueHandling.Ignore)]
         public List<HairColor> HairColor
         {
-            get { return _hairColor; }
             set
             {
                 if (value != null && value.Count > 0)
@@ -22,6 +21,14 @@ namespace FaceAPIHF.Face
                     _hairColor = new List<HairColor>();
                     _hairColor.Add(top);
                 }
+            }
+        }
+
+        public string Color
+        {
+            get
+            {
+                return _hairColor?.First().ToString;
             }
         }
     }

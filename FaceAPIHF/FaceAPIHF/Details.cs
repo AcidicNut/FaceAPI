@@ -21,8 +21,7 @@ namespace FaceAPIHF
         public void AddHairDataToStackLayout(StackLayout layout, Hair hair)
         {
             AddLabelToStackLayout(layout, "Bald:" + hair.Bald.ToString());
-            //I have no idea why, but hair.HairColor.Count == 1 for some reason... 
-            hair.HairColor.ForEach(t => AddLabelToStackLayout(layout, t.ToString));
+            AddLabelToStackLayout(layout, hair.Color);
         }
     }
 }
