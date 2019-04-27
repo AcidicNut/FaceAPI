@@ -4,24 +4,32 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              xmlns:local="clr-namespace:FaceAPIHF"
              x:Class="FaceAPIHF.MainPage">
-
-    <StackLayout x:Name="PageStackLayout" Orientation="Vertical">
-        <Grid>
-            <Image x:Name="FaceImage" Grid.Column="0" Grid.Row="0"/>
-            <Grid VerticalOptions="Start" Grid.Column="0" Grid.Row="1">
-                <Button Grid.Column="0" Text="FilePicker" Clicked="PickerButton_ClickedAsync" />
-                <Button Grid.Column="1" Text="Photo" Clicked="CameraButtonClickedAsync"/>
-                <Button Grid.Column="2" Text="Analize" Clicked="AnalizeButton_ClickedAsync"/>
-            </Grid>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <skia:SKCanvasView  Grid.Column="0" 
+                            Grid.Row="0" 
+                            x:Name="MyCanvas" 
+                            PaintSurface="OnCanvasViewPaintSurface" />
+        <Grid VerticalOptions="Start" 
+              Grid.Column="0" 
+              Grid.Row="1">
+            <Button Grid.Column="0" 
+                    Text="FilePicker" 
+                    Clicked="PickerButton_ClickedAsync" />
+            <Button Grid.Column="1" 
+                    Text="Photo" 
+                    Clicked="CameraButton_ClickedAsync"/>
+            <Button Grid.Column="2" 
+                    Text="Analize" 
+                    Clicked="AnalizeButton_ClickedAsync"/>
         </Grid>
-        <StackLayout Grid.Column="1" x:Name="DataStackLayout">
-            <Label x:Name="GenderLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="AgeLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="GlassesLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="BaldLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="MustacheLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="BeardLabel" Text="DATA1DATA2DATA3"/>
-            <Label x:Name="SideburnsLabel" Text="DATA1DATA2DATA3"/>
-        </StackLayout>
-    </StackLayout>
+        <ScrollView  Grid.Column="1" Grid.RowSpan="2">
+            <StackLayout 
+                         x:Name="DataStackLayout">
+            </StackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

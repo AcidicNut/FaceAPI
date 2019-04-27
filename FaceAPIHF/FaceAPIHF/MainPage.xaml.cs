@@ -31,27 +31,49 @@ namespace FaceAPIHF
             InitializeComponent();
             Client = GetClient();
             faceBitmap = BitmapExtensions.LoadBitmapResource(GetType(), "FaceAPIHF.kep.png");
-            FaceImage.Source = ImageSource.FromResource("FaceAPIHF.kep.png");
-            SizeChanged += MainPageSizeChanged;
+
+            MyCanvas.PaintSurface += OnCanvasViewPaintSurface;
+            MyCanvas.InvalidateSurface();
         }
 
-        private void MainPageSizeChanged(object sender, EventArgs e)
+        void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
-            PageStackLayout.Orientation = Width > Height ? StackOrientation.Horizontal : StackOrientation.Vertical;
+            SKImageInfo info = args.Info;
+            SKSurface surface = args.Surface;
+            SKCanvas canvas = surface.Canvas;
+
+            canvas.Clear();
+            canvas.DrawBitmap(faceBitmap, info.Rect, BitmapStretch.Uniform);
         }
 
         private async void AnalizeButton_ClickedAsync(object sender, EventArgs e)
         {
             var detectedFaces = await DetectAsync();
-            if (detectedFaces.Length > 0)
+            DataStackLayout.Children.Clear();
+            foreach ( var face in detectedFaces)
             {
-                GenderLabel.Text = "Gender : " + detectedFaces[0].FaceAttributes.Gender;
-                AgeLabel.Text = "Age : " + detectedFaces[0].FaceAttributes.Age;
-                GlassesLabel.Text = "Glasses : " + detectedFaces[0].FaceAttributes.Glasses;
-                BaldLabel.Text = "Bald : " + detectedFaces[0].FaceAttributes.Hair.Bald;
-                MustacheLabel.Text = "Moustache : " + detectedFaces[0].FaceAttributes.FacialHair.Moustache;
-                BeardLabel.Text = "Beard : " + detectedFaces[0].FaceAttributes.FacialHair.Beard;
-                SideburnsLabel.Text = "Sideburns : " + detectedFaces[0].FaceAttributes.FacialHair.Sideburns;
+                // Create canvas based on bitmap
+                using (SKCanvas canvas = new SKCanvas(faceBitmap))
+                {
+                    using (SKPaint paint = new SKPaint())
+                    {
+                        paint.Style = SKPaintStyle.Stroke;
+                        paint.Color = SKColors.Red;
+                        paint.StrokeWidth = 10;
+                        paint.StrokeCap = SKStrokeCap.Round;
+
+                        canvas.DrawRect(new SKRect(face.FaceRectangle.Left,
+                                                    face.FaceRectangle.Top,
+                           face.FaceRectangle.Left + face.FaceRectangle.Width,
+                           face.FaceRectangle.Top + face.FaceRectangle.Height), paint);
+                    }
+                }
+                MyCanvas.InvalidateSurface();
+                var detailsAdder = new Details();
+                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
+                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
+                detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
+                detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
             }
         }
 
@@ -65,16 +87,14 @@ namespace FaceAPIHF
                     PhotoSize = PhotoSize.Medium
                 });
                 if (file == null) return;
+                Stream stream = file.GetStream();
                 using (var memoryStream = new MemoryStream())
                 {
-                    file.GetStream().CopyTo(memoryStream);
+                    stream.CopyTo(memoryStream);
                     faceImageByteArray = memoryStream.ToArray();
                 }
-                FaceImage.Source = ImageSource.FromStream(() =>
-                {
-                    var stream = file.GetStream();
-                    return stream;
-                });
+                faceBitmap = SKBitmap.Decode(faceImageByteArray);
+                MyCanvas.InvalidateSurface();
             }
             catch (Exception ex)
             {
@@ -82,7 +102,7 @@ namespace FaceAPIHF
             }
         }
 
-        private async void CameraButtonClickedAsync(object sender, EventArgs e)
+        private async void CameraButton_ClickedAsync(object sender, EventArgs e)
         {
             var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
             {
@@ -92,12 +112,14 @@ namespace FaceAPIHF
 
             if (photo != null)
             {
+                Stream stream = photo.GetStream();
                 using (var memoryStream = new MemoryStream())
                 {
-                    photo.GetStream().CopyTo(memoryStream);
+                    stream.CopyTo(memoryStream);
                     faceImageByteArray = memoryStream.ToArray();
                 }
-                FaceImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
+                faceBitmap = SKBitmap.Decode(faceImageByteArray);
+                MyCanvas.InvalidateSurface();
             }
         }
         private HttpClient GetClient()
@@ -106,7 +128,7 @@ namespace FaceAPIHF
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
             return client;
         }
-        
+
         public FaceDetectResponse[] DeserializeResponse(string json)
         {
             return JsonConvert.DeserializeObject<FaceDetectResponse[]>(json);

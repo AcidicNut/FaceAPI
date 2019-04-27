@@ -29,5 +29,11 @@ namespace FaceAPIHF.Face
                 }
             }
         }
+        public string GetGenericInfo()
+        {
+            return "Gender: " + Gender + "\n" +
+                   "Age: " + Age + "\n" +
+                   "Glasses: " + Glasses;
+        }
     }
 }
