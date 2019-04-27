@@ -1,13 +1,11 @@
 ﻿using FaceAPIHF.Face;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xamarin.Forms;
 
 namespace FaceAPIHF
 {
     public class Details
     {
+        // StackLayoutra rárak egy Labelt paraméter szerinti stringgel.
         public void AddLabelToStackLayout(StackLayout layout, string details)
         {
             var label = new Label
@@ -18,9 +16,10 @@ namespace FaceAPIHF
             layout.Children.Add(label);
         }
 
+        // Lásd a föntit. Haj adatainak kiiratása.
         public void AddHairDataToStackLayout(StackLayout layout, Hair hair)
         {
-            AddLabelToStackLayout(layout, "Bald:" + hair.Bald.ToString());
+            AddLabelToStackLayout(layout, "Bald: " + hair.Bald.ToString());
             AddLabelToStackLayout(layout, hair.Color);
         }
     }

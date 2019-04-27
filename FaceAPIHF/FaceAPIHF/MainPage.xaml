@@ -6,26 +6,25 @@
              x:Class="FaceAPIHF.MainPage">
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <skia:SKCanvasView  Grid.Column="0" 
                             Grid.Row="0" 
                             x:Name="MyCanvas" 
-                            PaintSurface="OnCanvasViewPaintSurface" />
-        <Grid VerticalOptions="Start" 
-              Grid.Column="0" 
-              Grid.Row="1">
-            <Button Grid.Column="0" 
-                    Text="FilePicker" 
-                    Clicked="PickerButton_ClickedAsync" />
-            <Button Grid.Column="1" 
-                    Text="Photo" 
-                    Clicked="CameraButton_ClickedAsync"/>
-            <Button Grid.Column="2" 
-                    Text="Analize" 
-                    Clicked="AnalizeButton_ClickedAsync"/>
-        </Grid>
+                            PaintSurface="OnCanvasViewPaintSurface" 
+                            VerticalOptions="FillAndExpand"
+                            HorizontalOptions="FillAndExpand"/>
+        <StackLayout Grid.Row="1" Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand" >
+            <Button Text="FilePicker" 
+                    Clicked="PickerButton_ClickedAsync" 
+                    HorizontalOptions="FillAndExpand"/>
+            <Button Text="Photo" 
+                    Clicked="CameraButton_ClickedAsync"
+                    HorizontalOptions="FillAndExpand"/>
+            <Button Text="Analize" 
+                    Clicked="AnalizeButton_ClickedAsync"
+                    HorizontalOptions="FillAndExpand"/>
+        </StackLayout>
     </Grid>
 </ContentPage>

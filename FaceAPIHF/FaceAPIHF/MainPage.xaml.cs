@@ -2,10 +2,6 @@
 using Plugin.Media.Abstractions;
 using System;
 using Xamarin.Forms;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using FaceAPIHF.Face;
 using System.IO;
 using SkiaSharp;
@@ -15,24 +11,32 @@ namespace FaceAPIHF
 {
     public partial class MainPage : ContentPage
     {
-        private const string subscriptionKey = "8f68ecde3f0742b79204b409bdcc59cf";
-
-        private const string faceEndpoint =
-            "https://westeurope.api.cognitive.microsoft.com/face/v1.0";
-
-        private byte[] faceImageByteArray;
 
         private SKBitmap faceBitmap;
 
-        private readonly HttpClient Client;
-
         private StackLayout DataStackLayout;
+
+        private ScrollView DataScrollView;
+
+        private FaceDetection Detector;
 
         public MainPage()
         {
             InitializeComponent();
+            SetLayout();
+            Detector = new FaceDetection();
+
+            faceBitmap = BitmapExtensions.LoadBitmapResource(GetType(), "FaceAPIHF.kep.png");
+
+            SizeChanged += MainPageSizeChanged;
+            MyCanvas.PaintSurface += OnCanvasViewPaintSurface;
+            MyCanvas.InvalidateSurface();
+        }
+
+        private void SetLayout()
+        {
             DataStackLayout = new StackLayout();
-            ScrollView sc = new ScrollView
+            DataScrollView = new ScrollView
             {
                 Content = DataStackLayout
             };
@@ -40,22 +44,37 @@ namespace FaceAPIHF
             if (Device.Idiom == TargetIdiom.Phone)
             {
                 // layout views vertically
-                MainGrid.Children.Add(sc, 0, 2);
+                MainGrid.RowDefinitions.Add((new RowDefinition { Height = new GridLength(5, GridUnitType.Star) }));
+                MainGrid.Children.Add(DataScrollView, 0, 2);
             }
             else
             {
                 // layout views horizontally for a larger display (tablet or desktop)
-                MainGrid.Children.Add(sc, 1, 0);
-                Grid.SetRowSpan(sc, 3);
+                MainGrid.Children.Add(DataScrollView, 1, 0);
+                Grid.SetRowSpan(DataScrollView, 3);
             }
-            Client = GetClient();
-            faceBitmap = BitmapExtensions.LoadBitmapResource(GetType(), "FaceAPIHF.kep.png");
-
-            MyCanvas.PaintSurface += OnCanvasViewPaintSurface;
-            MyCanvas.InvalidateSurface();
         }
 
-        void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
+        private void MainPageSizeChanged(object sender, EventArgs e)
+        {
+            if (Device.Idiom == TargetIdiom.Phone)
+            {
+                if (Width > Height)
+                {
+                    MainGrid.Children.Remove(DataScrollView);
+                    MainGrid.Children.Add(DataScrollView, 1, 0);
+                    Grid.SetRowSpan(DataScrollView, 3);
+                }
+                else
+                {
+                    MainGrid.Children.Remove(DataScrollView);
+                    MainGrid.Children.Add(DataScrollView, 0, 2);
+                    Grid.SetRowSpan(DataScrollView, 1);
+                }
+            }
+        }
+
+        private void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
             SKImageInfo info = args.Info;
             SKSurface surface = args.Surface;
@@ -67,9 +86,9 @@ namespace FaceAPIHF
 
         private async void AnalizeButton_ClickedAsync(object sender, EventArgs e)
         {
-            if (faceImageByteArray != null)
+            if (Detector.faceImageByteArray != null)
             {
-                var detectedFaces = await DetectAsync();
+                var detectedFaces = await Detector.DetectAsync();
                 DataStackLayout.Children.Clear();
                 foreach (var face in detectedFaces)
                 {
@@ -89,14 +108,19 @@ namespace FaceAPIHF
                                face.FaceRectangle.Top + face.FaceRectangle.Height), paint);
                         }
                     }
-                    MyCanvas.InvalidateSurface();
-                    var detailsAdder = new Details();
-                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
-                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
-                    detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
-                    detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
+                    AddDetails(face);
                 }
+                MyCanvas.InvalidateSurface();
             }
+        }
+
+        private void AddDetails(FaceDetectResponse face)
+        {
+            var detailsAdder = new Details();
+            detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
+            detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
+            detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
+            detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
         }
 
         private async void PickerButton_ClickedAsync(object sender, EventArgs e)
@@ -104,17 +128,20 @@ namespace FaceAPIHF
             await CrossMedia.Current.Initialize();
             try
             {
-                var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
-                { });
+                var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions {});
+
                 if (file == null) return;
+
                 Stream stream = file.GetStream();
                 using (var memoryStream = new MemoryStream())
                 {
                     stream.CopyTo(memoryStream);
-                    faceImageByteArray = memoryStream.ToArray();
+                    Detector.faceImageByteArray = memoryStream.ToArray();
                 }
-                faceBitmap = SKBitmap.Decode(faceImageByteArray);
+                faceBitmap = SKBitmap.Decode(Detector.faceImageByteArray);
                 MyCanvas.InvalidateSurface();
+                file.Dispose();
+                DataStackLayout.Children.Clear();
             }
             catch (Exception ex)
             {
@@ -126,7 +153,6 @@ namespace FaceAPIHF
         {
             var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
             {
-                CompressionQuality = 92,
                 AllowCropping = false,
                 DefaultCamera = CameraDevice.Front
             });
@@ -137,37 +163,11 @@ namespace FaceAPIHF
                 using (var memoryStream = new MemoryStream())
                 {
                     stream.CopyTo(memoryStream);
-                    faceImageByteArray = memoryStream.ToArray();
+                    Detector.faceImageByteArray = memoryStream.ToArray();
                 }
-                faceBitmap = SKBitmap.Decode(faceImageByteArray);
+                faceBitmap = SKBitmap.Decode(Detector.faceImageByteArray);
                 MyCanvas.InvalidateSurface();
-            }
-        }
-        private HttpClient GetClient()
-        {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
-            return client;
-        }
-
-        public FaceDetectResponse[] DeserializeResponse(string json)
-        {
-            return JsonConvert.DeserializeObject<FaceDetectResponse[]>(json);
-        }
-
-        private async Task<FaceDetectResponse[]> DetectAsync()
-        {
-            using (var content = new ByteArrayContent(faceImageByteArray))
-            {
-                string requestParameters = "returnFaceId=true&returnFaceLandmarks=false" +
-                "&returnFaceAttributes=age,gender,facialHair,glasses,hair,smile";
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                using (var httpResponse = await Client.PostAsync($"{faceEndpoint}/detect" + "?" + requestParameters, content))
-                {
-                    httpResponse.EnsureSuccessStatusCode();
-                    var json = httpResponse.Content.ReadAsStringAsync().Result;
-                    return DeserializeResponse(json);
-                }
+                DataStackLayout.Children.Clear();
             }
         }
     }

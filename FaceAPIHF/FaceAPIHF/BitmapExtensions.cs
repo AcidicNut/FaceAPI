@@ -3,11 +3,11 @@ using System;
 using System.IO;
 using System.Reflection;
 
-//source: https://github.com/xamarin/xamarin-forms-samples/blob/master/SkiaSharpForms/Demos/Demos/SkiaSharpFormsDemos/BitmapExtensions.cs
 namespace FaceAPIHF
 {
     static class BitmapExtensions
     {
+        // ResourceID alapján betölti az erőforrást és skiasharp-os bitmapot ad vissza.
         public static SKBitmap LoadBitmapResource(Type type, string resourceID)
         {
             Assembly assembly = type.GetTypeInfo().Assembly;
@@ -18,138 +18,22 @@ namespace FaceAPIHF
             }
         }
 
-        public static uint RgbaMakePixel(byte red, byte green, byte blue, byte alpha = 255)
-        {
-            return (uint)((alpha << 24) | (blue << 16) | (green << 8) | red);
-        }
-
-        public static void RgbaGetBytes(this uint pixel, out byte red, out byte green, out byte blue, out byte alpha)
-        {
-            red = (byte)pixel;
-            green = (byte)(pixel >> 8);
-            blue = (byte)(pixel >> 16);
-            alpha = (byte)(pixel >> 24);
-        }
-
-        public static uint BgraMakePixel(byte blue, byte green, byte red, byte alpha = 255)
-        {
-            return (uint)((alpha << 24) | (red << 16) | (green << 8) | blue);
-        }
-
-        public static void BgraGetBytes(this uint pixel, out byte blue, out byte green, out byte red, out byte alpha)
-        {
-            blue = (byte)pixel;
-            green = (byte)(pixel >> 8);
-            red = (byte)(pixel >> 16);
-            alpha = (byte)(pixel >> 24);
-        }
-
+        // SkiaSharp-os Canvas-re Kirajzol egy képet. "ApectFit"
         public static void DrawBitmap(this SKCanvas canvas, SKBitmap bitmap, SKRect dest,
-                                      BitmapStretch stretch,
-                                      BitmapAlignment horizontal = BitmapAlignment.Center,
-                                      BitmapAlignment vertical = BitmapAlignment.Center,
-                                      SKPaint paint = null)
+                                      BitmapStretch stretch)
         {
-            if (stretch == BitmapStretch.Fill)
-            {
-                canvas.DrawBitmap(bitmap, dest, paint);
-            }
-            else
-            {
-                float scale = 1;
+            // Scaling beállítása Aspect fit-hez hasonlóra
+            float scale = Math.Min(dest.Width / bitmap.Width, dest.Height / bitmap.Height);
+            SKRect display = CalculateDisplayRect(dest, scale * bitmap.Width, scale * bitmap.Height);
 
-                switch (stretch)
-                {
-                    case BitmapStretch.None:
-                        break;
-
-                    case BitmapStretch.Uniform:
-                        scale = Math.Min(dest.Width / bitmap.Width, dest.Height / bitmap.Height);
-                        break;
-
-                    case BitmapStretch.UniformToFill:
-                        scale = Math.Max(dest.Width / bitmap.Width, dest.Height / bitmap.Height);
-                        break;
-                }
-
-                SKRect display = CalculateDisplayRect(dest, scale * bitmap.Width, scale * bitmap.Height,
-                                                      horizontal, vertical);
-
-                canvas.DrawBitmap(bitmap, display, paint);
-            }
+            canvas.DrawBitmap(bitmap, display);
         }
 
-        public static void DrawBitmap(this SKCanvas canvas, SKBitmap bitmap, SKRect source, SKRect dest,
-                                      BitmapStretch stretch,
-                                      BitmapAlignment horizontal = BitmapAlignment.Center,
-                                      BitmapAlignment vertical = BitmapAlignment.Center,
-                                      SKPaint paint = null)
+        private static SKRect CalculateDisplayRect(SKRect dest, float bmpWidth, float bmpHeight)
         {
-            if (stretch == BitmapStretch.Fill)
-            {
-                canvas.DrawBitmap(bitmap, source, dest, paint);
-            }
-            else
-            {
-                float scale = 1;
-
-                switch (stretch)
-                {
-                    case BitmapStretch.None:
-                        break;
-
-                    case BitmapStretch.Uniform:
-                        scale = Math.Min(dest.Width / source.Width, dest.Height / source.Height);
-                        break;
-
-                    case BitmapStretch.UniformToFill:
-                        scale = Math.Max(dest.Width / source.Width, dest.Height / source.Height);
-                        break;
-                }
-
-                SKRect display = CalculateDisplayRect(dest, scale * source.Width, scale * source.Height,
-                                                      horizontal, vertical);
-
-                canvas.DrawBitmap(bitmap, source, display, paint);
-            }
-        }
-
-        static SKRect CalculateDisplayRect(SKRect dest, float bmpWidth, float bmpHeight,
-                                           BitmapAlignment horizontal, BitmapAlignment vertical)
-        {
-            float x = 0;
-            float y = 0;
-
-            switch (horizontal)
-            {
-                case BitmapAlignment.Center:
-                    x = (dest.Width - bmpWidth) / 2;
-                    break;
-
-                case BitmapAlignment.Start:
-                    break;
-
-                case BitmapAlignment.End:
-                    x = dest.Width - bmpWidth;
-                    break;
-            }
-
-            switch (vertical)
-            {
-                case BitmapAlignment.Center:
-                    y = (dest.Height - bmpHeight) / 2;
-                    break;
-
-                case BitmapAlignment.Start:
-                    break;
-
-                case BitmapAlignment.End:
-                    y = dest.Height - bmpHeight;
-                    break;
-            }
-
-            x += dest.Left;
-            y += dest.Top;
+            // Relatív koordináta számolása, majd eltolás a képernyő helyzetével.
+            float x = (dest.Width - bmpWidth) / 2 + dest.Left;
+            float y = (dest.Height - bmpHeight) / 2 + dest.Top;
 
             return new SKRect(x, y, x + bmpWidth, y + bmpHeight);
         }
@@ -157,18 +41,7 @@ namespace FaceAPIHF
 
     public enum BitmapStretch
     {
-        None,
-        Fill,
         Uniform,
-        UniformToFill,
-        AspectFit = Uniform,
-        AspectFill = UniformToFill
-    }
-
-    public enum BitmapAlignment
-    {
-        Start,
-        Center,
-        End
+        AspectFit = Uniform
     }
 }

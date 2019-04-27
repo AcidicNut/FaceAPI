@@ -9,6 +9,9 @@ namespace FaceAPIHF.Face
         public double Bald { get; set; }
 
         private List<HairColor> _hairColor;
+        // Beállításkor a Face API-n keresztül egy listában kapjuk meg az adatokat,
+        // de nem akartam az összeset kiírni, 
+        // ezért inkább csak a legnagyobb pontszámmal rendelkezőt állítjuk be _hairColornak
         [JsonProperty("hairColor", NullValueHandling = NullValueHandling.Ignore)]
         public List<HairColor> HairColor
         {
@@ -17,9 +20,10 @@ namespace FaceAPIHF.Face
                 if (value != null && value.Count > 0)
                 {
                     // filter hair with highest score
-                    var top = value.OrderByDescending(entry => entry.Confidence).Take(1).First();
-                    _hairColor = new List<HairColor>();
-                    _hairColor.Add(top);
+                    _hairColor = new List<HairColor>
+                    {
+                        value.OrderByDescending(entry => entry.Confidence).Take(1).First()
+                    };
                 }
             }
         }
