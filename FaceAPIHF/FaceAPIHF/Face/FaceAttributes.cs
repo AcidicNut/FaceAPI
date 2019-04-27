@@ -24,8 +24,10 @@ namespace FaceAPIHF.Face
                 {
                     // filter strongest emotion
                     var top = value.OrderByDescending(pair => pair.Value).Take(1).First();
-                    _emotion = new Dictionary<string, double>();
-                    _emotion.Add(top.Key, top.Value);
+                    _emotion = new Dictionary<string, double>
+                    {
+                        { top.Key, top.Value }
+                    };
                 }
             }
         }

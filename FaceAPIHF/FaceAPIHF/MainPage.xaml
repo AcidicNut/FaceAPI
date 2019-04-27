@@ -4,10 +4,11 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              xmlns:local="clr-namespace:FaceAPIHF"
              x:Class="FaceAPIHF.MainPage">
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <skia:SKCanvasView  Grid.Column="0" 
                             Grid.Row="0" 
@@ -26,10 +27,5 @@
                     Text="Analize" 
                     Clicked="AnalizeButton_ClickedAsync"/>
         </Grid>
-        <ScrollView  Grid.Column="1" Grid.RowSpan="2">
-            <StackLayout 
-                         x:Name="DataStackLayout">
-            </StackLayout>
-        </ScrollView>
     </Grid>
 </ContentPage>

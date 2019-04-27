@@ -26,9 +26,28 @@ namespace FaceAPIHF
 
         private readonly HttpClient Client;
 
+        private StackLayout DataStackLayout;
+
         public MainPage()
         {
             InitializeComponent();
+            DataStackLayout = new StackLayout();
+            ScrollView sc = new ScrollView
+            {
+                Content = DataStackLayout
+            };
+
+            if (Device.Idiom == TargetIdiom.Phone)
+            {
+                // layout views vertically
+                MainGrid.Children.Add(sc, 0, 2);
+            }
+            else
+            {
+                // layout views horizontally for a larger display (tablet or desktop)
+                MainGrid.Children.Add(sc, 1, 0);
+                Grid.SetRowSpan(sc, 3);
+            }
             Client = GetClient();
             faceBitmap = BitmapExtensions.LoadBitmapResource(GetType(), "FaceAPIHF.kep.png");
 
@@ -83,9 +102,7 @@ namespace FaceAPIHF
             try
             {
                 var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions
-                {
-                    PhotoSize = PhotoSize.Medium
-                });
+                {});
                 if (file == null) return;
                 Stream stream = file.GetStream();
                 using (var memoryStream = new MemoryStream())
@@ -106,7 +123,8 @@ namespace FaceAPIHF
         {
             var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
             {
-                PhotoSize = PhotoSize.Medium,
+                CompressionQuality = 92,
+                AllowCropping = false,
                 DefaultCamera = CameraDevice.Front
             });
 
