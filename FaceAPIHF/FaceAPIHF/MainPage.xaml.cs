@@ -11,7 +11,6 @@ namespace FaceAPIHF
 {
     public partial class MainPage : ContentPage
     {
-
         private SKBitmap faceBitmap;
 
         private StackLayout DataStackLayout;
@@ -55,6 +54,7 @@ namespace FaceAPIHF
             }
         }
 
+        // Tudom hogy ez platform specifikus, de nekem ez így tetszik
         private void MainPageSizeChanged(object sender, EventArgs e)
         {
             if (Device.Idiom == TargetIdiom.Phone)
@@ -74,6 +74,8 @@ namespace FaceAPIHF
             }
         }
 
+        // SKiaSharp Canvas kirajzolásért felelős event handler-je. 
+        // A canvas InvalidateSurface() függvényének hívásakor is lefut.
         private void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
             SKImageInfo info = args.Info;
@@ -84,6 +86,7 @@ namespace FaceAPIHF
             canvas.DrawBitmap(faceBitmap, info.Rect, BitmapStretch.Uniform);
         }
 
+        // Gomb nyomásra a képen látható arcokat detektálja, kirajzolja és kiírja az adataikat.
         private async void AnalizeButton_ClickedAsync(object sender, EventArgs e)
         {
             if (Detector.faceImageByteArray != null)
@@ -114,21 +117,24 @@ namespace FaceAPIHF
             }
         }
 
+        // Egy archoz tartozó adatokat írja ki, ehhez a DataStackLayout-ra Label-öket rak.
         private void AddDetails(FaceDetectResponse face)
         {
             var detailsAdder = new Details();
+            // Code duplication
             detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.GetGenericInfo());
             detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceAttributes.FacialHair.ToString);
             detailsAdder.AddHairDataToStackLayout(DataStackLayout, face.FaceAttributes.Hair);
             detailsAdder.AddLabelToStackLayout(DataStackLayout, face.FaceRectangle.ToString);
         }
 
+        // Felhasználónak ad lehetőseget egy kép kiválasztására. Kiválasztás után kirajzolodik.
         private async void PickerButton_ClickedAsync(object sender, EventArgs e)
         {
             await CrossMedia.Current.Initialize();
             try
             {
-                var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions {});
+                var file = await CrossMedia.Current.PickPhotoAsync(new PickMediaOptions { });
 
                 if (file == null) return;
 
@@ -149,25 +155,35 @@ namespace FaceAPIHF
             }
         }
 
+        // Felhasználónak ad lehetőseget egy kép készítésére. Kiválasztás után kirajzolodik.
+        // DefaultCamera = CameraDevice.Front nem működik Androidon.
         private async void CameraButton_ClickedAsync(object sender, EventArgs e)
         {
-            var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
+            await CrossMedia.Current.Initialize();
+            try
             {
-                AllowCropping = false,
-                DefaultCamera = CameraDevice.Front
-            });
-
-            if (photo != null)
-            {
-                Stream stream = photo.GetStream();
-                using (var memoryStream = new MemoryStream())
+                var photo = await CrossMedia.Current.TakePhotoAsync(new StoreCameraMediaOptions()
                 {
-                    stream.CopyTo(memoryStream);
-                    Detector.faceImageByteArray = memoryStream.ToArray();
+                    AllowCropping = false,
+                    DefaultCamera = CameraDevice.Front
+                });
+
+                if (photo != null)
+                {
+                    Stream stream = photo.GetStream();
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        stream.CopyTo(memoryStream);
+                        Detector.faceImageByteArray = memoryStream.ToArray();
+                    }
+                    faceBitmap = SKBitmap.Decode(Detector.faceImageByteArray);
+                    MyCanvas.InvalidateSurface();
+                    DataStackLayout.Children.Clear();
                 }
-                faceBitmap = SKBitmap.Decode(Detector.faceImageByteArray);
-                MyCanvas.InvalidateSurface();
-                DataStackLayout.Children.Clear();
+            }
+            catch (Exception ex)
+            {
+                string test = ex.Message;
             }
         }
     }

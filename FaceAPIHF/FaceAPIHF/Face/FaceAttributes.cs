@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace FaceAPIHF.Face
+﻿namespace FaceAPIHF.Face
 {
     public class FaceAttributes
     {

@@ -28,6 +28,7 @@ namespace FaceAPIHF.Face
             }
         }
 
+        // Visszaadja a színt
         public string Color
         {
             get
