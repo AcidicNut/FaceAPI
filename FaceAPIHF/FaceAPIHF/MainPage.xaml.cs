@@ -92,26 +92,24 @@ namespace FaceAPIHF
             if (Detector.faceImageByteArray != null)
             {
                 var detectedFaces = await Detector.DetectAsync();
-                DataStackLayout.Children.Clear();
-                foreach (var face in detectedFaces)
+                DataStackLayout.Children.Clear();// Create canvas based on bitmap
+                using (SKCanvas canvas = new SKCanvas(faceBitmap))
                 {
-                    // Create canvas based on bitmap
-                    using (SKCanvas canvas = new SKCanvas(faceBitmap))
+                    using (SKPaint paint = new SKPaint())
                     {
-                        using (SKPaint paint = new SKPaint())
+                        paint.Style = SKPaintStyle.Stroke;
+                        paint.Color = SKColors.Red;
+                        paint.StrokeWidth = 10;
+                        paint.StrokeCap = SKStrokeCap.Round;
+                        foreach (var face in detectedFaces)
                         {
-                            paint.Style = SKPaintStyle.Stroke;
-                            paint.Color = SKColors.Red;
-                            paint.StrokeWidth = 10;
-                            paint.StrokeCap = SKStrokeCap.Round;
-
                             canvas.DrawRect(new SKRect(face.FaceRectangle.Left,
                                                         face.FaceRectangle.Top,
                                face.FaceRectangle.Left + face.FaceRectangle.Width,
                                face.FaceRectangle.Top + face.FaceRectangle.Height), paint);
+                            AddDetails(face);
                         }
                     }
-                    AddDetails(face);
                 }
                 MyCanvas.InvalidateSurface();
             }
