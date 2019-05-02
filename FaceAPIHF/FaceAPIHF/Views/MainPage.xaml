@@ -17,13 +17,13 @@
                             HorizontalOptions="FillAndExpand"/>
         <StackLayout Grid.Row="1" Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand" >
             <Button Text="FilePicker" 
-                    Clicked="PickerButton_ClickedAsync" 
+                    Command="{Binding FileCommand}" 
                     HorizontalOptions="FillAndExpand"/>
             <Button Text="Photo" 
-                    Clicked="CameraButton_ClickedAsync"
+                    Command="{Binding PhotoCommand}"
                     HorizontalOptions="FillAndExpand"/>
             <Button Text="Analize" 
-                    Clicked="AnalizeButton_ClickedAsync"
+                    Command="{Binding AnalizeCommand}"
                     HorizontalOptions="FillAndExpand"/>
         </StackLayout>
     </Grid>
