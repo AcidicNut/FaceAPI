@@ -2,10 +2,11 @@
 using Plugin.Media.Abstractions;
 using System;
 using Xamarin.Forms;
-using FaceAPIHF.Face;
 using System.IO;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
+using FaceAPIHF.ViewModels;
+using FaceAPIHF.Models.Face;
 
 namespace FaceAPIHF
 {

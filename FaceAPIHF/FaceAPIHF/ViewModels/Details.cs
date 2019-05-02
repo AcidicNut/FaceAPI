@@ -1,7 +1,7 @@
-﻿using FaceAPIHF.Face;
+﻿using FaceAPIHF.Models.Face;
 using Xamarin.Forms;
 
-namespace FaceAPIHF
+namespace FaceAPIHF.ViewModels
 {
     public class Details
     {

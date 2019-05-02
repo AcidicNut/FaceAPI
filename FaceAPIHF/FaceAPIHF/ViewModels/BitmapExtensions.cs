@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace FaceAPIHF
+namespace FaceAPIHF.ViewModels
 {
     static class BitmapExtensions
     {

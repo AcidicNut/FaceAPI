@@ -1,4 +1,4 @@
-﻿namespace FaceAPIHF.Face
+﻿namespace FaceAPIHF.Models.Face
 {
     public class FaceAttributes
     {

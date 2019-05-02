@@ -1,10 +1,10 @@
-﻿using FaceAPIHF.Face;
+﻿using FaceAPIHF.Models.Face;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace FaceAPIHF
+namespace FaceAPIHF.ViewModels
 {
     public class FaceDetection
     {
@@ -39,7 +39,7 @@ namespace FaceAPIHF
             {
                 string requestParameters = "returnFaceId=true&returnFaceLandmarks=false" +
                 "&returnFaceAttributes=age,gender,facialHair,glasses,hair";
-                // Láttam olyan implementációt is ahol json-t küld, de az lényegében byte[]-ből csinál json-t majd azt küldi el, ami plusz egy konvertálás lenne kliens oldalon.
+                // Láttam olyan implementációt ( microsoftos tutorialban ), ahol json-t küld, de az lényegében byte[]-ből csinál json-t majd azt küldi el, ami plusz egy konvertálás lenne kliens oldalon.
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 using (var httpResponse = await Client.PostAsync($"{_faceEndpoint}/detect" + "?" + requestParameters, content))
                 {
