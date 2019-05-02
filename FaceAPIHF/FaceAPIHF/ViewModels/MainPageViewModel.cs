@@ -4,10 +4,8 @@ using Plugin.Media.Abstractions;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -28,10 +26,12 @@ namespace FaceAPIHF.ViewModels
 
         private SKCanvasView MyCanvas;
 
+        // Kamera gomb esemenykezelese
         public ICommand PhotoCommand { get; private set; }
+        // FilePicker gomb kezelese
         public ICommand FileCommand { get; private set; }
+        // Face Api hivasert felelos gomb kezelese
         public ICommand AnalizeCommand { get; private set; }
-        public ICommand CanvasCommand { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -53,7 +53,7 @@ namespace FaceAPIHF.ViewModels
             AnalizeCommand = new Command(AnalizeButton_ClickedAsync);
             MyCanvas.InvalidateSurface();
         }
-
+        //Platform fuggo layout beallitas... lehetne nativ kod
         private void SetLayout()
         {
             DataStackLayout = new StackLayout();
@@ -89,6 +89,7 @@ namespace FaceAPIHF.ViewModels
             }
         }
 
+        // Rajzolast vegzo function.
         private async Task AnalizeDraw(FaceDetectResponse[] detectedFaces)
         {
             using (SKCanvas canvas = new SKCanvas(faceBitmap))

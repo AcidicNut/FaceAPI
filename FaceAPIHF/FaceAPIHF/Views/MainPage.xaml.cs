@@ -1,12 +1,8 @@
-﻿using Plugin.Media;
-using Plugin.Media.Abstractions;
-using System;
+﻿using System;
 using Xamarin.Forms;
-using System.IO;
 using SkiaSharp;
 using SkiaSharp.Views.Forms;
 using FaceAPIHF.ViewModels;
-using FaceAPIHF.Models.Face;
 
 namespace FaceAPIHF
 {
@@ -17,7 +13,6 @@ namespace FaceAPIHF
         public MainPage()
         {
             InitializeComponent();
-            //faceBitmap = BitmapExtensions.LoadBitmapResource(GetType(), "FaceAPIHF.kep.png");
             viewModel = new MainPageViewModel(MainGrid, MyCanvas);
             BindingContext = viewModel;
 
@@ -36,7 +31,7 @@ namespace FaceAPIHF
                 canvas.DrawBitmap(viewModel.faceBitmap, info.Rect, BitmapStretch.Uniform);
         }
 
-        // Tudom hogy ez platform specifikus, de nekem ez így tetszik
+        // Lehetne platformspecifikus
         private void MainPageSizeChanged(object sender, EventArgs e)
         {
             if (Device.Idiom == TargetIdiom.Phone)
