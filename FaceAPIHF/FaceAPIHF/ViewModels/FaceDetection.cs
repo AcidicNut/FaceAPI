@@ -8,7 +8,7 @@ namespace FaceAPIHF.ViewModels
 {
     public class FaceDetection
     {
-        private const string _subscriptionKey = "8f68ecde3f0742b79204b409bdcc59cf";
+        private const string _subscriptionKey = "<API KEY>";
 
         private const string _faceEndpoint =
             "https://westeurope.api.cognitive.microsoft.com/face/v1.0";
